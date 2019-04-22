@@ -13,16 +13,16 @@ Role Variables
 --------------
 
 ```bash
-radarr_release_url: https://api.github.com/repos/Lidarr/Lidrr/releases.linux.tar.gz # API link for releases
+lidarr_release_url: https://api.github.com/repos/Lidarr/Lidarr/releases.linux.tar.gz # API link for releases
 ```
 
 Example Playbook
 ----------------
 
 ```plain
-- hosts: radarr
+- hosts: lidarr
   roles:
-  - {name: radarr, become: yes}
+  - {name: lidarr, become: yes}
 ```
 
 References
