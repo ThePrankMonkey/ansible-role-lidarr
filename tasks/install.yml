@@ -1,0 +1,46 @@
+---
+# tasks file for lidarr :: install
+- debug:
+    msg:
+      - "###########################"
+      - "##                       ##"
+      - "##   lidarr -- install   ##"
+      - "##                       ##"
+      - "###########################"
+- name: Get Current Download URL
+  shell: |
+    set -o pipefail
+    curl -s {{ lidarr_release_url }} | grep linux.tar.gz | grep browser_download_url | head -1 | cut -d \" -f 4
+  args:
+    warn: false
+  register: lidarr_url_current
+  changed_when: false
+- name: Download Lidarr
+  get_url:
+    url: "{{ lidarr_url_current.stdout }}"
+    dest: /tmp/lidarr.tar.gz
+  notify: empty_/opt/Lidarr
+- meta: flush_handlers
+- name: Extract lidarr.tar.gz
+  unarchive:
+    src: /tmp/lidarr.tar.gz
+    dest: /opt
+    remote_src: yes
+    creates: /opt/Lidarr/Lidarr.exe
+- name: Set owner on lidarr folder
+  file:
+    path: /opt/Lidarr
+    owner: lidarr
+    group: lidarr
+    state: directory
+    recurse: yes
+- name: Add SystemD Unit File
+  copy:
+    src: lidarr.service
+    dest: /etc/systemd/system/lidarr.service
+- name: Start Lidarr Service
+  systemd:
+    name: lidarr
+    state: started
+    enabled: yes
+    daemon_reload: yes
